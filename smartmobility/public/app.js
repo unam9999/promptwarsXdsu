@@ -2,6 +2,7 @@
 // SafeRoute AI — Main Application
 // ============================================================
 // Orchestrates Google Maps, Safe Mode engine, and Gemini AI.
+// Maps API key is fetched from server at runtime — never hardcoded.
 // ============================================================
 
 let map;
@@ -14,6 +15,35 @@ let autocompleteDestination;
 let safeModeEnabled = false;
 let currentRoutes = [];
 let selectedRouteIndex = 0;
+
+
+// ═══════════════════════════════════════════════════
+//  BOOTSTRAP — Fetch API key, then load Maps
+// ═══════════════════════════════════════════════════
+
+(async function bootstrap() {
+  try {
+    const res = await fetch("/api/config");
+    if (!res.ok) throw new Error("Failed to load config");
+    const { mapsApiKey } = await res.json();
+
+    // Dynamically inject Google Maps script
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${mapsApiKey}&libraries=places,visualization&callback=initMap`;
+    script.async = true;
+    script.defer = true;
+    script.onerror = () => {
+      document.getElementById("map").innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#FF4757;font-family:Inter,sans-serif;font-size:18px;text-align:center;padding:40px;">Failed to load Google Maps.<br>Please check your API key configuration.</div>';
+    };
+    document.body.appendChild(script);
+  } catch (err) {
+    console.error("Bootstrap failed:", err);
+    document.getElementById("map").innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#FF4757;font-family:Inter,sans-serif;font-size:18px;text-align:center;padding:40px;">Could not connect to server.<br>Please try again later.</div>';
+  }
+})();
+
 
 // ── DOM References ──
 const $safeModeCheckbox = document.getElementById("safeModeCheckbox");
@@ -43,7 +73,7 @@ const $themeBtn         = document.getElementById("themeBtn");
 
 
 // ═══════════════════════════════════════════════════
-//  MAP INITIALIZATION
+//  MAP INITIALIZATION (called by Google Maps callback)
 // ═══════════════════════════════════════════════════
 
 function initMap() {
@@ -117,6 +147,13 @@ function initMap() {
       getRoute();
     }
   });
+
+  // Escape to close results
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeResults();
+    }
+  });
 }
 
 
@@ -126,6 +163,9 @@ function initMap() {
 
 function toggleSafeMode() {
   safeModeEnabled = $safeModeCheckbox.checked;
+
+  // Update aria state
+  $safeModeCheckbox.setAttribute("aria-checked", safeModeEnabled);
 
   // Update label
   $safeModeLabel.classList.toggle("active", safeModeEnabled);
@@ -194,6 +234,7 @@ async function getRoute() {
   // Loading state
   $routeBtn.classList.add("loading");
   $routeBtn.disabled = true;
+  $routeBtn.setAttribute("aria-busy", "true");
   clearRenderers();
   closeResults();
 
@@ -212,6 +253,7 @@ async function getRoute() {
     directionsService.route(request, async (result, status) => {
       $routeBtn.classList.remove("loading");
       $routeBtn.disabled = false;
+      $routeBtn.setAttribute("aria-busy", "false");
 
       if (status !== google.maps.DirectionsStatus.OK) {
         showToast(`Route not found: ${status}`, "error");
@@ -229,6 +271,7 @@ async function getRoute() {
   } catch (err) {
     $routeBtn.classList.remove("loading");
     $routeBtn.disabled = false;
+    $routeBtn.setAttribute("aria-busy", "false");
     showToast("Error calculating route", "error");
     console.error(err);
   }
@@ -272,6 +315,9 @@ function renderNormalResult(route) {
 
   $resultsPanel.classList.add("visible");
   fitBounds(route);
+
+  // Focus management for a11y
+  $resultsPanel.focus();
 }
 
 
@@ -337,6 +383,9 @@ async function renderSafeModeResults(routes, origin, destination) {
 
   fitBounds(ranked[0].route);
 
+  // Focus management for a11y
+  $resultsPanel.focus();
+
   // Generate AI briefing (async, don't block)
   $aiBriefingText.innerHTML = '<span class="typing-dots">Generating safety analysis</span>';
   $aiBriefingText.classList.add("loading");
@@ -356,7 +405,7 @@ async function renderSafeModeResults(routes, origin, destination) {
     $aiBriefingText.textContent = briefing;
     $aiBriefingText.classList.remove("loading");
   } catch (err) {
-    $aiBriefingText.textContent = "Unable to generate AI briefing. Check your Gemini API key.";
+    $aiBriefingText.textContent = "Unable to generate AI briefing. Please try again.";
     $aiBriefingText.classList.remove("loading");
   }
 }
@@ -417,6 +466,9 @@ function renderRouteCards(ranked) {
     const card = document.createElement("div");
     card.className = `route-card ${isSelected ? "selected" : ""} ${tier.tier}`;
     card.setAttribute("data-index", idx);
+    card.setAttribute("role", "listitem");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-label", `Route ${idx + 1} via ${r.summary}, safety score ${r.safetyScore}, ${r.duration}, ${r.distance}`);
 
     // Deduplicate warning labels
     const uniqueWarnings = [];
@@ -449,6 +501,13 @@ function renderRouteCards(ranked) {
     `;
 
     card.addEventListener("click", () => selectRoute(idx, ranked));
+    // Keyboard: Enter/Space to select
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        selectRoute(idx, ranked);
+      }
+    });
     $routeCards.appendChild(card);
   });
 }
@@ -511,6 +570,8 @@ function clearRenderers() {
 
 function closeResults() {
   $resultsPanel.classList.remove("visible");
+  // Return focus to route button for a11y
+  $routeBtn.focus();
 }
 
 
@@ -539,6 +600,7 @@ function applyTheme(theme) {
   const isDark = theme === "dark";
   $themeBtn.textContent = isDark ? "🌙" : "☀️";
   $themeBtn.title = isDark ? "Switch to Light Mode" : "Switch to Dark Mode";
+  $themeBtn.setAttribute("aria-label", isDark ? "Switch to Light Mode" : "Switch to Dark Mode");
 
   if (map) {
     map.setOptions({ styles: isDark ? CONFIG.MAP.STYLES : LIGHT_MAP_STYLES });

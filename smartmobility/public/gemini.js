@@ -1,7 +1,8 @@
 // ============================================================
 // SafeRoute AI — Gemini API Integration
 // ============================================================
-// Sends route context to Gemini and returns a safety briefing.
+// Sends route context to our server-side proxy (/api/briefing)
+// which forwards to Gemini. The API key never leaves the server.
 // ============================================================
 
 const GeminiAI = (() => {
@@ -45,37 +46,23 @@ RULES:
 - Do NOT use markdown formatting, just plain text`;
 
     try {
-      const endpoint = `${CONFIG.GEMINI_ENDPOINT}/${CONFIG.GEMINI_MODEL}:generateContent?key=${CONFIG.GOOGLE_API_KEY}`;
-
-      const response = await fetch(endpoint, {
+      // Call our server-side proxy instead of Google directly
+      const response = await fetch("/api/briefing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 200,
-            topP: 0.9
-          }
-        })
+        body: JSON.stringify({ prompt })
       });
 
       if (!response.ok) {
-        const errText = await response.text();
-        console.error("Gemini API error:", errText);
+        const err = await response.json().catch(() => ({}));
+        console.error("Briefing API error:", err);
         return getFallbackBriefing(safetyScore, warnings);
       }
 
       const data = await response.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (!text) {
-        return getFallbackBriefing(safetyScore, warnings);
-      }
-
-      return text.trim();
+      return data.briefing || getFallbackBriefing(safetyScore, warnings);
     } catch (err) {
-      console.error("Gemini fetch error:", err);
+      console.error("Briefing fetch error:", err);
       return getFallbackBriefing(safetyScore, warnings);
     }
   }

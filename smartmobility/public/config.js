@@ -1,22 +1,12 @@
 // ============================================================
 // SafeRoute AI — Configuration
 // ============================================================
-// Single Google API key used for both Maps and Gemini.
-// Ensure these APIs are enabled in your Google Cloud Console:
-//   - Maps JavaScript API
-//   - Directions API
-//   - Places API
-//   - Maps JavaScript API Visualization Library
-//   - Generative Language API (Gemini)
+// Client-side configuration only.
+// API keys are loaded from the server at runtime via /api/config.
+// Gemini calls are proxied through /api/briefing (server-side).
 // ============================================================
 
 const CONFIG = {
-  GOOGLE_API_KEY: "AIzaSyDwNKnkHqZld2RdXQac580rQZwN4rBaPcg",
-
-  // Gemini model endpoint
-  GEMINI_MODEL: "gemini-2.0-flash",
-  GEMINI_ENDPOINT: "https://generativelanguage.googleapis.com/v1beta/models",
-
   // Safe Mode defaults
   SAFE_MODE: {
     SCAN_RADIUS_M: 300,        // meters — radius to scan around each route point

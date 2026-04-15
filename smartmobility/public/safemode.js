@@ -174,3 +174,8 @@ const SafeMode = (() => {
     haversineDistance
   };
 })();
+
+// ── Node.js module export for testing ──
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = SafeMode;
+}

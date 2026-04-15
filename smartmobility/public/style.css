@@ -14,6 +14,39 @@
   box-sizing: border-box;
 }
 
+/* ── Accessibility: Skip Link ── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 12px 24px;
+  background: var(--safe);
+  color: #000;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 16px;
+}
+
+/* ── Accessibility: Screen-reader only ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ── Dark Theme (default) ── */
 :root {
   --bg-primary: #0B0F1A;

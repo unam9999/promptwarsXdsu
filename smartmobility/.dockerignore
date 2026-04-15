@@ -1,0 +1,10 @@
+node_modules
+.env
+.env.*
+.git
+.gitignore
+tests
+graphify-out
+*.md
+deploy.sh
+.dockerignore

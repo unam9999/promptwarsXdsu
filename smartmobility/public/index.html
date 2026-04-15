@@ -10,18 +10,21 @@
 </head>
 <body data-theme="dark">
 
+  <!-- ═══ Skip to Content (a11y) ═══ -->
+  <a href="#inputPanel" class="skip-link" id="skipLink">Skip to route input</a>
+
   <!-- ═══ Header ═══ -->
-  <header class="header" id="header">
+  <header class="header" id="header" role="banner">
     <div class="logo">
-      <div class="logo-icon">🛡️</div>
+      <div class="logo-icon" aria-hidden="true">🛡️</div>
       <div class="logo-text">Safe<span>Route</span> AI</div>
     </div>
     <div class="header-right">
-      <button class="theme-btn" id="themeBtn" title="Toggle light/dark theme">🌙</button>
+      <button class="theme-btn" id="themeBtn" title="Toggle light/dark theme" aria-label="Toggle light or dark theme">🌙</button>
       <div class="safe-mode-toggle">
         <span class="safe-mode-label" id="safeModeLabel">Safe Mode</span>
-        <label class="toggle-switch" id="safeToggle">
-          <input type="checkbox" id="safeModeCheckbox">
+        <label class="toggle-switch" id="safeToggle" aria-label="Toggle Safe Mode for crime-aware routing">
+          <input type="checkbox" id="safeModeCheckbox" role="switch" aria-checked="false">
           <div class="toggle-track"></div>
           <div class="toggle-knob"></div>
         </label>
@@ -30,35 +33,37 @@
   </header>
 
   <!-- ═══ Mode Indicator ═══ -->
-  <div class="mode-indicator normal" id="modeIndicator">
+  <div class="mode-indicator normal" id="modeIndicator" role="status" aria-live="polite">
     <span id="modeIndicatorText">📍 Normal Mode</span>
   </div>
 
   <!-- ═══ Map ═══ -->
-  <div class="map-container">
+  <div class="map-container" role="application" aria-label="Interactive route map of Bengaluru">
     <div id="map"></div>
   </div>
 
   <!-- ═══ Input Panel ═══ -->
-  <div class="input-panel" id="inputPanel">
+  <div class="input-panel" id="inputPanel" role="search" aria-label="Route search">
     <div class="input-group">
-      <span class="input-icon">🟢</span>
+      <span class="input-icon" aria-hidden="true">🟢</span>
+      <label for="originInput" class="sr-only">Starting point</label>
       <input type="text" id="originInput" placeholder="Starting point" autocomplete="off">
     </div>
     <div class="input-group">
-      <span class="input-icon">🔴</span>
+      <span class="input-icon" aria-hidden="true">🔴</span>
+      <label for="destinationInput" class="sr-only">Destination</label>
       <input type="text" id="destinationInput" placeholder="Destination" autocomplete="off">
     </div>
-    <button class="btn-route" id="routeBtn" disabled>
+    <button class="btn-route" id="routeBtn" disabled aria-label="Calculate route">
       <span class="btn-text">Get Route</span>
-      <div class="spinner"></div>
+      <div class="spinner" aria-hidden="true"></div>
     </button>
   </div>
 
   <!-- ═══ Crime Heatmap Legend ═══ -->
-  <div class="crime-legend" id="crimeLegend">
+  <div class="crime-legend" id="crimeLegend" aria-label="Crime density legend">
     <h4>Crime Density</h4>
-    <div class="legend-gradient"></div>
+    <div class="legend-gradient" aria-hidden="true"></div>
     <div class="legend-labels">
       <span>Low</span>
       <span>High</span>
@@ -66,17 +71,17 @@
   </div>
 
   <!-- ═══ Results Panel ═══ -->
-  <div class="results-panel" id="resultsPanel">
+  <div class="results-panel" id="resultsPanel" role="region" aria-label="Route results" aria-live="polite">
     <div class="results-header">
       <div class="results-title" id="resultsTitle">Route Results</div>
-      <button class="results-close" id="resultsClose">✕</button>
+      <button class="results-close" id="resultsClose" aria-label="Close results panel">✕</button>
     </div>
 
     <!-- Score Section (Safe Mode only) -->
-    <div class="score-section" id="scoreSection" style="display: none;">
+    <div class="score-section" id="scoreSection" style="display: none;" aria-label="Safety score">
       <div class="score-ring-container">
         <div class="score-ring">
-          <svg viewBox="0 0 90 90">
+          <svg viewBox="0 0 90 90" role="img" aria-label="Safety score ring chart">
             <circle class="score-ring-bg" cx="45" cy="45" r="38" />
             <circle class="score-ring-fill" id="scoreRingFill" cx="45" cy="45" r="38"
               stroke-dasharray="238.76"
@@ -84,7 +89,7 @@
           </svg>
         </div>
         <div class="score-value">
-          <div class="score-number" id="scoreNumber">—</div>
+          <div class="score-number" id="scoreNumber" aria-live="polite">—</div>
           <div class="score-label">Safety</div>
         </div>
       </div>
@@ -95,15 +100,15 @@
     </div>
 
     <!-- Route Cards Container -->
-    <div class="route-cards" id="routeCards"></div>
+    <div class="route-cards" id="routeCards" role="list" aria-label="Available routes"></div>
 
     <!-- AI Briefing (Safe Mode only) -->
     <div class="ai-briefing" id="aiBriefing" style="display: none;">
       <div class="ai-briefing-header">
-        <div class="ai-briefing-icon">✨</div>
+        <div class="ai-briefing-icon" aria-hidden="true">✨</div>
         <div class="ai-briefing-title">AI Safety Briefing</div>
       </div>
-      <div class="ai-briefing-text" id="aiBriefingText">
+      <div class="ai-briefing-text" id="aiBriefingText" aria-live="polite">
         <span class="typing-dots">Generating safety analysis</span>
       </div>
     </div>
@@ -118,7 +123,7 @@
   </div>
 
   <!-- ═══ Toast ═══ -->
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
 
   <!-- ═══ Scripts (order matters) ═══ -->
   <script src="config.js"></script>
@@ -127,10 +132,7 @@
   <script src="gemini.js"></script>
   <script src="app.js"></script>
 
-  <!-- Google Maps (loaded last, calls initMap) -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwNKnkHqZld2RdXQac580rQZwN4rBaPcg&libraries=places,visualization&callback=initMap">
-  </script>
+  <!-- Google Maps is loaded dynamically by app.js after fetching API key from server -->
 
 </body>
 </html>

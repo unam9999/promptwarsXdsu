@@ -1,18 +1,34 @@
-# ── Stage 1: Use nginx to serve static files ──
-FROM nginx:alpine
+# ── Build stage ──
+FROM node:20-alpine AS builder
 
-# Copy all app files into nginx's default serve directory
-COPY . /usr/share/nginx/html
+WORKDIR /app
+COPY package.json ./
+RUN npm install --omit=dev
 
-# Simple nginx config — serve index.html, gzip enabled
-RUN echo 'server { \
-  listen 8080; \
-  root /usr/share/nginx/html; \
-  index index.html; \
-  gzip on; \
-  gzip_types text/plain text/css application/javascript application/json; \
-  location / { try_files $uri $uri/ /index.html; } \
-}' > /etc/nginx/conf.d/default.conf
+# ── Production stage ──
+FROM node:20-alpine
 
+# Security: run as non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copy deps from builder
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy application files
+COPY package.json server.js ./
+COPY public ./public
+
+# Switch to non-root user
+USER appuser
+
+# Cloud Run uses PORT env var (default 8080)
+ENV PORT=8080
 EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/config || exit 1
+
+CMD ["node", "server.js"]
