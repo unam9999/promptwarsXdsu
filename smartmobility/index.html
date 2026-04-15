@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SafeRoute AI — Crime-aware route navigation for Bengaluru. Toggle Safe Mode to find the safest route, not just the fastest.">
+  <title>SafeRoute AI — Safe Commute Intelligence</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- ═══ Header ═══ -->
+  <header class="header" id="header">
+    <div class="logo">
+      <div class="logo-icon">🛡️</div>
+      <div class="logo-text">Safe<span>Route</span> AI</div>
+    </div>
+    <div class="safe-mode-toggle">
+      <span class="safe-mode-label" id="safeModeLabel">Safe Mode</span>
+      <label class="toggle-switch" id="safeToggle">
+        <input type="checkbox" id="safeModeCheckbox">
+        <div class="toggle-track"></div>
+        <div class="toggle-knob"></div>
+      </label>
+    </div>
+  </header>
+
+  <!-- ═══ Mode Indicator ═══ -->
+  <div class="mode-indicator normal" id="modeIndicator">
+    <span id="modeIndicatorText">📍 Normal Mode</span>
+  </div>
+
+  <!-- ═══ Map ═══ -->
+  <div class="map-container">
+    <div id="map"></div>
+  </div>
+
+  <!-- ═══ Input Panel ═══ -->
+  <div class="input-panel" id="inputPanel">
+    <div class="input-group">
+      <span class="input-icon">🟢</span>
+      <input type="text" id="originInput" placeholder="Starting point" autocomplete="off">
+    </div>
+    <div class="input-group">
+      <span class="input-icon">🔴</span>
+      <input type="text" id="destinationInput" placeholder="Destination" autocomplete="off">
+    </div>
+    <button class="btn-route" id="routeBtn" disabled>
+      <span class="btn-text">Get Route</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+
+  <!-- ═══ Crime Heatmap Legend ═══ -->
+  <div class="crime-legend" id="crimeLegend">
+    <h4>Crime Density</h4>
+    <div class="legend-gradient"></div>
+    <div class="legend-labels">
+      <span>Low</span>
+      <span>High</span>
+    </div>
+  </div>
+
+  <!-- ═══ Results Panel ═══ -->
+  <div class="results-panel" id="resultsPanel">
+    <div class="results-header">
+      <div class="results-title" id="resultsTitle">Route Results</div>
+      <button class="results-close" id="resultsClose">✕</button>
+    </div>
+
+    <!-- Score Section (Safe Mode only) -->
+    <div class="score-section" id="scoreSection" style="display: none;">
+      <div class="score-ring-container">
+        <div class="score-ring">
+          <svg viewBox="0 0 90 90">
+            <circle class="score-ring-bg" cx="45" cy="45" r="38" />
+            <circle class="score-ring-fill" id="scoreRingFill" cx="45" cy="45" r="38"
+              stroke-dasharray="238.76"
+              stroke-dashoffset="238.76" />
+          </svg>
+        </div>
+        <div class="score-value">
+          <div class="score-number" id="scoreNumber">—</div>
+          <div class="score-label">Safety</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;" id="scoreTierText">Analyzing...</div>
+        <div style="font-size: 12px; color: var(--text-secondary);" id="scoreSummary"></div>
+      </div>
+    </div>
+
+    <!-- Route Cards Container -->
+    <div class="route-cards" id="routeCards"></div>
+
+    <!-- AI Briefing (Safe Mode only) -->
+    <div class="ai-briefing" id="aiBriefing" style="display: none;">
+      <div class="ai-briefing-header">
+        <div class="ai-briefing-icon">✨</div>
+        <div class="ai-briefing-title">AI Safety Briefing</div>
+      </div>
+      <div class="ai-briefing-text" id="aiBriefingText">
+        <span class="typing-dots">Generating safety analysis</span>
+      </div>
+    </div>
+
+    <!-- Normal Mode Result -->
+    <div class="normal-result" id="normalResult" style="display: none;">
+      <div class="normal-result-info">
+        <h3 id="normalRouteTitle">Fastest Route</h3>
+        <p id="normalRouteInfo"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Toast ═══ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ═══ Scripts (order matters) ═══ -->
+  <script src="config.js"></script>
+  <script src="data/crimes.js"></script>
+  <script src="safemode.js"></script>
+  <script src="gemini.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Google Maps (loaded last, calls initMap) -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwNKnkHqZld2RdXQac580rQZwN4rBaPcg&libraries=places,visualization&callback=initMap">
+  </script>
+
+</body>
+</html>
