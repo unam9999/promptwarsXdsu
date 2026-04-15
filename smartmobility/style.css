@@ -1,8 +1,8 @@
 /* ============================================================
    SafeRoute AI — Design System
    ============================================================
-   Premium dark-mode with glassmorphism, animated safety score
-   ring, and Safe Mode visual states.
+   Premium glassmorphism UI with light & dark theme support.
+   Theme is toggled via [data-theme="light"] on <body>.
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -14,13 +14,26 @@
   box-sizing: border-box;
 }
 
+/* ── Dark Theme (default) ── */
 :root {
   --bg-primary: #0B0F1A;
   --bg-surface: #141824;
   --bg-surface-hover: #1A2030;
-  --bg-glass: rgba(20, 24, 36, 0.75);
+  --bg-glass: rgba(20, 24, 36, 0.80);
+  --bg-header: rgba(11, 15, 26, 0.85);
   --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-glow: rgba(0, 212, 106, 0.3);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --shadow-panel: rgba(0, 0, 0, 0.4);
+  --shadow-panel-top: rgba(0, 0, 0, 0.4);
+  --ring-bg: rgba(255, 255, 255, 0.06);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-bg-focus: rgba(255, 255, 255, 0.08);
+  --close-btn-bg: rgba(255, 255, 255, 0.06);
+  --close-btn-hover: rgba(255, 255, 255, 0.12);
+  --toggle-track-off: #2A3040;
+  --pac-shadow: rgba(0, 0, 0, 0.5);
+  --pac-icon-filter: invert(0.7);
+  --mode-normal-bg: rgba(20, 24, 36, 0.8);
 
   --safe: #00D46A;
   --safe-glow: rgba(0, 212, 106, 0.25);
@@ -42,6 +55,41 @@
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── Light Theme ── */
+[data-theme="light"] {
+  --bg-primary: #F0F4F8;
+  --bg-surface: #FFFFFF;
+  --bg-surface-hover: #F7FAFC;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-header: rgba(255, 255, 255, 0.90);
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.15);
+  --shadow-panel: rgba(0, 0, 0, 0.12);
+  --shadow-panel-top: rgba(0, 0, 0, 0.10);
+  --ring-bg: rgba(0, 0, 0, 0.07);
+  --input-bg: rgba(0, 0, 0, 0.04);
+  --input-bg-focus: rgba(0, 0, 0, 0.06);
+  --close-btn-bg: rgba(0, 0, 0, 0.06);
+  --close-btn-hover: rgba(0, 0, 0, 0.12);
+  --toggle-track-off: #CBD5E0;
+  --pac-shadow: rgba(0, 0, 0, 0.15);
+  --pac-icon-filter: invert(0);
+  --mode-normal-bg: rgba(240, 244, 248, 0.9);
+
+  --safe: #00A854;
+  --safe-glow: rgba(0, 168, 84, 0.2);
+  --danger: #E53E3E;
+  --danger-glow: rgba(229, 62, 62, 0.2);
+  --warning: #D97706;
+  --warning-glow: rgba(217, 119, 6, 0.2);
+  --accent: #5A4FCF;
+  --accent-glow: rgba(90, 79, 207, 0.15);
+
+  --text-primary: #1A202C;
+  --text-secondary: #4A5568;
+  --text-muted: #A0AEC0;
+}
+
 html, body {
   height: 100%;
   font-family: var(--font);
@@ -61,7 +109,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background: rgba(11, 15, 26, 0.85);
+  background: var(--bg-header);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
@@ -93,6 +141,12 @@ html, body {
 
 .logo-text span {
   color: var(--safe);
+}
+
+/* ── Header Right Controls ── */
+.header-right {
+  display: flex;
+  align-items: center;
 }
 
 /* ── Safe Mode Toggle ── */
@@ -132,7 +186,7 @@ html, body {
   position: absolute;
   inset: 0;
   border-radius: var(--radius-pill);
-  background: #2A3040;
+  background: var(--toggle-track-off);
   transition: var(--transition);
   border: 1.5px solid transparent;
 }
@@ -189,7 +243,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px var(--shadow-panel);
 }
 
 .input-group {
@@ -208,7 +262,7 @@ html, body {
 .input-group input {
   width: 100%;
   padding: 12px 14px 12px 40px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--input-bg);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -225,7 +279,7 @@ html, body {
 .input-group input:focus {
   border-color: var(--safe);
   box-shadow: 0 0 0 3px var(--safe-glow);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--input-bg-focus);
 }
 
 .btn-route {
@@ -295,7 +349,7 @@ html, body {
   padding: 20px;
   transform: translateY(100%);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -8px 32px var(--shadow-panel-top);
 }
 
 .results-panel.visible {
@@ -334,7 +388,7 @@ html, body {
   width: 32px;
   height: 32px;
   border: none;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--close-btn-bg);
   border-radius: 8px;
   color: var(--text-secondary);
   font-size: 18px;
@@ -346,7 +400,7 @@ html, body {
 }
 
 .results-close:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--close-btn-hover);
   color: var(--text-primary);
 }
 
@@ -373,7 +427,7 @@ html, body {
 
 .route-card:hover {
   background: var(--bg-surface-hover);
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--border-hover);
 }
 
 .route-card.selected {
@@ -510,7 +564,7 @@ html, body {
 
 .score-ring-bg {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.06);
+  stroke: var(--ring-bg);
   stroke-width: 6;
 }
 
@@ -644,7 +698,7 @@ html, body {
 }
 
 .mode-indicator.normal {
-  background: rgba(20, 24, 36, 0.8);
+  background: var(--mode-normal-bg);
   backdrop-filter: blur(10px);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
@@ -757,13 +811,36 @@ html, body {
   }
 }
 
+/* ── Theme Toggle Button ── */
+.theme-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--close-btn-bg);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  margin-right: 12px;
+}
+
+.theme-btn:hover {
+  background: var(--close-btn-hover);
+  color: var(--text-primary);
+  transform: rotate(20deg);
+}
+
 /* ── Google Autocomplete dropdown override ── */
 .pac-container {
   background: var(--bg-surface) !important;
   border: 1px solid var(--border-subtle) !important;
   border-radius: var(--radius-sm) !important;
   margin-top: 4px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 8px 24px var(--pac-shadow) !important;
   font-family: var(--font) !important;
 }
 
@@ -785,7 +862,7 @@ html, body {
 }
 
 .pac-icon {
-  filter: invert(0.7) !important;
+  filter: var(--pac-icon-filter) !important;
 }
 
 .pac-matched {

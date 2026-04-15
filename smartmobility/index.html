@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
 </head>
-<body>
+<body data-theme="dark">
 
   <!-- ═══ Header ═══ -->
   <header class="header" id="header">
@@ -16,13 +16,16 @@
       <div class="logo-icon">🛡️</div>
       <div class="logo-text">Safe<span>Route</span> AI</div>
     </div>
-    <div class="safe-mode-toggle">
-      <span class="safe-mode-label" id="safeModeLabel">Safe Mode</span>
-      <label class="toggle-switch" id="safeToggle">
-        <input type="checkbox" id="safeModeCheckbox">
-        <div class="toggle-track"></div>
-        <div class="toggle-knob"></div>
-      </label>
+    <div class="header-right">
+      <button class="theme-btn" id="themeBtn" title="Toggle light/dark theme">🌙</button>
+      <div class="safe-mode-toggle">
+        <span class="safe-mode-label" id="safeModeLabel">Safe Mode</span>
+        <label class="toggle-switch" id="safeToggle">
+          <input type="checkbox" id="safeModeCheckbox">
+          <div class="toggle-track"></div>
+          <div class="toggle-knob"></div>
+        </label>
+      </div>
     </div>
   </header>
 

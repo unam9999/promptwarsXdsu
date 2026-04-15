@@ -39,6 +39,7 @@ const $normalRouteTitle = document.getElementById("normalRouteTitle");
 const $normalRouteInfo  = document.getElementById("normalRouteInfo");
 const $crimeLegend      = document.getElementById("crimeLegend");
 const $toast            = document.getElementById("toast");
+const $themeBtn         = document.getElementById("themeBtn");
 
 
 // ═══════════════════════════════════════════════════
@@ -61,6 +62,16 @@ function initMap() {
   });
 
   directionsService = new google.maps.DirectionsService();
+
+  // ── Apply saved theme on load ──
+  const savedTheme = localStorage.getItem("saferoute-theme") || "dark";
+  applyTheme(savedTheme);
+
+  // ── Theme button ──
+  $themeBtn.addEventListener("click", () => {
+    const current = document.body.getAttribute("data-theme");
+    applyTheme(current === "dark" ? "light" : "dark");
+  });
 
   // ── Places Autocomplete ──
   const autocompleteOpts = {
@@ -502,6 +513,37 @@ function closeResults() {
   $resultsPanel.classList.remove("visible");
 }
 
+
+// ═══════════════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════════════
+
+const LIGHT_MAP_STYLES = [
+  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#e0e0e0" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#dadada" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#c9e4f0" }] },
+  { featureType: "poi", elementType: "geometry", stylers: [{ color: "#eeeeee" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#d4e9c2" }] },
+  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#e5e5e5" }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#c9c9c9" }] }
+];
+
+function applyTheme(theme) {
+  document.body.setAttribute("data-theme", theme);
+  localStorage.setItem("saferoute-theme", theme);
+
+  const isDark = theme === "dark";
+  $themeBtn.textContent = isDark ? "🌙" : "☀️";
+  $themeBtn.title = isDark ? "Switch to Light Mode" : "Switch to Dark Mode";
+
+  if (map) {
+    map.setOptions({ styles: isDark ? CONFIG.MAP.STYLES : LIGHT_MAP_STYLES });
+  }
+}
 
 // ═══════════════════════════════════════════════════
 //  TOAST NOTIFICATIONS
